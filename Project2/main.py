@@ -16,21 +16,19 @@ class Dijkstra:
         self.directions = [ [-1, -1],[-1, 0], [-1, 1],
                             [0, -1], [0, 0], [0, 1],
                             [1, -1], [1, 0], [1, 1]] 
-        self.recently_closed=[]           
+        self.recently_closed=[]
+        self.closed={}           
 
     def search(self, arena):
         solution_found = False
-        open_nodes = arena.open_nodes
-        arena.open_nodes=[]
-        closed_nodes=[]
-        for current_node in open_nodes:
+        open_nodes=arena.open_nodes.copy()
+        for nodecoord,current_node in open_nodes.items():
             # if len(arena.nodes)>0:
             #     for n in arena.nodes:
             #         if(not n==current_node):
             #             arena.nodes.append(current_node)
             # else:
-            arena.nodes.append(current_node)
-            closed_nodes.append(current_node)
+            # print(nodecoord)
             # print(current_node.x, current_node.y)
             if current_node== arena.goal_location:
                 arena.goal_location=current_node
@@ -44,35 +42,21 @@ class Dijkstra:
                         arena.obstacle_nodes.append(node)
                         continue
 
-                if(arena.isValid(node) and \
-                    # not any(node== n.parent for n in arena.open_nodes) and \
-                    # not any(node== n.parent for n in open_nodes) and \
-                    # not any(node== n.parent.parent for n in open_nodes) and \
-                    # not any(node== n.parent.parent for n in arena.open_nodes) and \
-                    not any(node== n for n in arena.nodes) and \
-                    # not any(node== n for n in closed_nodes) and \
-                    # not any(node== n.parent for n in closed_nodes) and \
-                    # not any(node== n for n in arena.obstacle_nodes) and \
-                    # not any(node== n.parent for n in arena.obstacle_nodes) and \
-                    not node==current_node and \
-                    not node==current_node.parent and \
-                    not any(node==n for n in open_nodes) and \
-                    not any(node==n for n in arena.open_nodes) and \
-                    True):  
-                    # for n in arena.open_nodes+open_nodes+closed_nodes+arena.nodes+self.recently_closed:
-                    #     if(node ==n):
-                    #         node = n
-                    #     if(node ==n.parent):
-                    #         node = n.parent
-                    # if(not node.parent):
-                    #     node.parent=current_node
-                    # print("Appending node: ",node.x, node.y)
-                    costToCome = current_node.costToCome + math.sqrt(math.pow(x_-current_node.x,2)+math.pow(y_-current_node.y,2))
-                    if node.costToCome > costToCome:
-                        node.parent=current_node
-                        node.costToCome=costToCome
-                    arena.open_nodes.append(node) 
-            self.recently_closed.extend(closed_nodes)    
+                if(not arena.isValid(node)):
+                    continue
+
+                node_visited = arena.nodes.get((node.x,node.y))
+                # print(node_visited,node.x,node.y)
+                if node_visited:
+                    continue
+                
+                costToCome = current_node.costToCome + math.sqrt(math.pow(x_-current_node.x,2)+math.pow(y_-current_node.y,2))
+                if node.costToCome > costToCome:
+                    node.parent=current_node
+                    node.costToCome=costToCome
+                arena.open_nodes[(node.x,node.y)]=node
+            arena.nodes[(current_node.x, current_node.y)] = current_node
+            del arena.open_nodes[(current_node.x, current_node.y)]
         return solution_found, arena
 
 if __name__ == "__main__":
@@ -90,8 +74,8 @@ if __name__ == "__main__":
         arena.updateEvents()
         
         solution_found, arena = dijkstra.search(arena)
-        # for n in arena.open_nodes:
-        #     print(n.x, n.y, n.costToCome) 
+        # for key,val in arena.open_nodes.items():
+        #     print(key) 
         # input()
         # Update MAP - Pygame display
         arena.drawAll()

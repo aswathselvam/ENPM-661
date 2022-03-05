@@ -44,15 +44,15 @@ class Arena:
         # All objects will be drawn in this 'bacground' surface.
         self.background = pygame.Surface((self.WIDTH, self.HEIGHT))
 
-        self.nodes = []
-        self.noded = {}
+        self.nodes = {}
         self.start_location = self.Node(0,0) 
         self.start_location.costToCome=0
         self.start_location.parent= self.Node(0,0)
-        self.open_nodes = [self.start_location]
+        self.open_nodes={}
+        self.open_nodes[(self.start_location.x,self.start_location.y)]=self.start_location
         self.obstacle_nodes = []
-        # self.goal_location = self.Node(self.WIDTH-5,self.HEIGHT-5)
-        self.goal_location = self.Node(50,30)
+        self.goal_location = self.Node(self.WIDTH-5,self.HEIGHT-5)
+        # self.goal_location = self.Node(50,30)
         self.selectStart = True
         self.obstacles = self.createObstacles()
 
@@ -106,11 +106,11 @@ class Arena:
         # time.sleep(0.01)
 
     def drawNode(self):
-        for node in self.nodes:
+        for _,node in self.nodes.items():
             color = ORANGE
             pygame.draw.rect(self.background, color, (node.x, node.y, 1, 1))
         # print("OpenNodes: \n",self.open_nodes)
-        for node in self.open_nodes:
+        for _,node in self.open_nodes.items():
             color = YELLOW
             pygame.draw.rect(self.background, color, (node.x, node.y, 1, 1))
 
@@ -135,7 +135,7 @@ class Arena:
         pygame.display.update()
 
     def drawPath(self):
-        leastnode=self.open_nodes[0]
+        leastnode=next(iter(self.open_nodes))
         for n in self.open_nodes:
             if(n<leastnode):
                 leastnode=n
@@ -205,7 +205,7 @@ class Arena:
             return f1 and f2 and fmidleft or fmidright and f4 and f3
 
     def createObstacles(self):
-        circObstacle1 = Arena.Circle(5, 5, 1) 
+        circObstacle1 = Arena.Circle(10, 10, 5) 
         hexObstacle = Arena.Hexagon(200, 100, 70)      
         circObstacle = Arena.Circle(self.WIDTH-100, 185, 40) 
         p1, p2, p3, p4 = (36, 185), (105, 100), (105-25, 180), (115, 210)
