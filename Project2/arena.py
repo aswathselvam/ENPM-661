@@ -50,7 +50,7 @@ class Arena:
         self.start_location.parent= self.Node(0,0)
         self.open_nodes={}
         self.open_nodes[(self.start_location.x,self.start_location.y)]=self.start_location
-        self.obstacle_nodes = []
+        self.obstacle_nodes = {}
         self.goal_location = self.Node(self.WIDTH-5,self.HEIGHT-5)
         # self.goal_location = self.Node(50,30)
         self.selectStart = True
@@ -114,7 +114,7 @@ class Arena:
             color = YELLOW
             pygame.draw.rect(self.background, color, (node.x, node.y, 1, 1))
 
-        for node in self.obstacle_nodes:
+        for _,node in self.obstacle_nodes.items():
             color = WHITE
             pygame.draw.rect(self.background, color, (node.x, node.y, 1, 1))
 
@@ -210,7 +210,10 @@ class Arena:
         circObstacle = Arena.Circle(self.WIDTH-100, 185, 40) 
         p1, p2, p3, p4 = (36, 185), (105, 100), (105-25, 180), (115, 210)
         polygObstacle = Arena.Polygon(p1, p2, p3, p4)
-        return [circObstacle1, circObstacle, hexObstacle, polygObstacle] 
+        obstacleList=[]
+        # obstacleList.append(circObstacle1)
+        obstacleList.extend([circObstacle,hexObstacle,polygObstacle])
+        return obstacleList
     
     def isCollision(self, x,y):
         states = []
