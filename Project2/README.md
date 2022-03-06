@@ -11,7 +11,7 @@ python3 main.py
 ```
 Input the start and goal state
 ### Files:
-- [main.py](main.py) - main executable
+- [Dijkstra-pathplanning-Aswath-Muthuselvam.py](Dijkstra-pathplanning-Aswath-Muthuselvam.py) - main executable
 - [arena.py](arena.py) - Grapphics and Datatypes
 - [utils.py](utils.py) - File operations and creating video
 - [simulation_video.mp4](simulation_video.mp4) - Simulation video
@@ -27,3 +27,7 @@ Input the start and goal state
 ```bash
 pip install -r requirements.txt
 ```
+
+## Author details:
+- Aswath Muthuselvam
+- Code is available at this [Github Repository](https://github.com/aswathselvam/ENPM-661/tree/master/Project2)
