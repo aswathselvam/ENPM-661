@@ -53,7 +53,7 @@ class Arena:
         self.open_nodes[(self.start_location.x,self.start_location.y)]=self.start_location
         self.obstacle_nodes = {}
         self.goal_location = self.Node(self.WIDTH-5,self.HEIGHT-5)
-        # self.goal_location = self.Node(50,30)
+        # self.goal_location = self.Node(150,190)
         sx=input("Enter x coordinate of Start Location(ex: 0): ")
         sy=input("Enter y coordinate of Start Location(ex: 0): ")
         gx=input("Enter x coordinate of Goal Location(ex: 100): ")
@@ -168,17 +168,39 @@ class Arena:
             
 
     class Hexagon:
-        def isInside(self, x,y):
-            m12, m34, m45,  m61 = 0.5,  -0.5, 0.5, -0.5   
-            b12, b34, b45,  b61 = 36, 165, -35, 235, 
-            b56, b23 = 235, 165        
-            
-            side1 = (y-m12*x - b12 ) < 0
-            side2 = x - b23 > 0  
-            side3 = (y-m34*x - b34 ) > 0
-            side4 = (y-m45*x - b45 ) > 0
-            side5 = x - b56 < 0
-            side6 = (y-m61*x - b61 ) <0
+        def __init__(self, x, y, Dx):
+            self.type = 'polygon'
+            self.cx, self.cy = x, y
+            a = Dx/np.sqrt(2) # side length
+            DY_2 =  np.sqrt(a**2 - (Dx/2)**2)
+            self.p1 = (x, y + DY_2)
+            self.p2 = (x - Dx/2, y+DY_2/2)
+            self.p3 = (x - Dx/2, y-DY_2/2) 
+            self.p4 = (x, y - DY_2)
+            self.p5 = (x + Dx/2, y-DY_2/2)
+            self.p6 = (x + Dx/2, y+DY_2/2)
+            self.points = np.array([self.p1, self.p2, self.p3, self.p4, self.p5, self.p6])
+            print(f"Hexagon corner points: \n{self.points}")
+            self.m12 = (self.p1[1]-self.p2[1])/(self.p1[0]-self.p2[0])
+            self.b12 = -self.m12*self.p2[0] + self.p2[1]
+            self.m23=0
+            self.b23 = self.m23*self.p3[1] + self.p3[0] 
+            self.m34 = (self.p3[1]-self.p4[1])/(self.p3[0]-self.p4[0])
+            self.b34 = -self.m34*self.p4[0] + self.p4[1]
+            self.m45 = (self.p4[1]-self.p5[1])/(self.p4[0]-self.p5[0])
+            self.b45 = -self.m45*self.p5[0] + self.p5[1]
+            self.m56=0
+            self.b56 = self.m56*self.p5[1] + self.p5[0] 
+            self.m61 = (self.p6[1]-self.p1[1])/(self.p6[0]-self.p1[0])
+            self.b61 = -self.m61*self.p1[0] + self.p1[1]
+
+        def isInside(self, x,y):        
+            side1 = (y-self.m12*x - self.b12 ) < 0
+            side2 = x - self.b23 > 0  
+            side3 = (y-self.m34*x - self.b34 ) > 0
+            side4 = (y-self.m45*x - self.b45 ) > 0
+            side5 = x - self.b56 < 0
+            side6 = (y-self.m61*x - self.b61 ) <0
             return  side1 and side2 and side3 and side4 and side5 and side6 
 
     class Circle:
@@ -192,24 +214,30 @@ class Arena:
             return  (x - self.x) **2 + (y- self.y)**2 - self.radius**2 < 0 
 
     class Polygon:
+        def __init__(self, *args):
+            self.type = 'polygon'
+            self.points = np.array(args)
+            print(f"Polygon with corners at {self.points}")
+            self.m12, self.m23, self.m34, self.m41 = -1.24, -3.2, 0.85, 0.32
+            self.b12, self.b23, self.b34, self.b41 =  230,439, 112, 173
+
         def isInside(self, x,y):
-            m12, m23, m34, m41 = -1.24, -3.2, 0.85, 0.32
-            b12, b23, b34, b41 =  230,439, 112, 173
-            f1 = (y - m12* x - b12) > 0   
-            f2 = (y - m23* x - b23) < 0 
+            f1 = (y - self.m12* x - self.b12) > 0   
+            f2 = (y - self.m23* x - self.b23) < 0 
             fmidleft = (y - (-0.1)* x - 189) < 0
 
             fmidright = (y - (-0.1)* x - 189) >= 0
-            f3 = (y - m34* x - b34) > 0  
-            f4 = (y - m41* x - b41) < 0 
+            f3 = (y - self.m34* x - self.b34) > 0  
+            f4 = (y - self.m41* x - self.b41) < 0 
 
             return f1 and f2 and fmidleft or fmidright and f4 and f3
 
     def createObstacles(self):
         circObstacle1 = Arena.Circle(10, 10, 5) 
-        hexObstacle = Arena.Hexagon()      
-        circObstacle = Arena.Circle(self.WIDTH-100, 185, 40) 
-        polygObstacle = Arena.Polygon()
+        hexObstacle = Arena.Hexagon(200, 100, 70)      
+        circObstacle = Arena.Circle(self.WIDTH-100, 185, 40)
+        p1, p2, p3, p4 = (36, 185), (105, 100), (105-25, 180), (115, 210) 
+        polygObstacle = Arena.Polygon(p1, p2, p3, p4)
         obstacleList=[]
         # obstacleList.append(circObstacle1)
         obstacleList.extend([circObstacle,hexObstacle,polygObstacle])
