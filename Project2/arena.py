@@ -54,12 +54,12 @@ class Arena:
         self.obstacle_nodes = {}
         self.goal_location = self.Node(self.WIDTH-5,self.HEIGHT-5)
         # self.goal_location = self.Node(50,30)
-        # sx=input("Enter x coordinate of Start Location(ex: 0): ")
-        # sy=input("Enter y coordinate of Start Location(ex: 0): ")
-        # gx=input("Enter x coordinate of Goal Location(ex: 100): ")
-        # gy=input("Enter y coordinate of Goal Location(ex: 100): ")
-        # self.start_location.x, self.start_location.y = int(sx),int(sy)
-        # self.goal_location.x, self.goal_location.y = int(gx),int(gy)
+        sx=input("Enter x coordinate of Start Location(ex: 0): ")
+        sy=input("Enter y coordinate of Start Location(ex: 0): ")
+        gx=input("Enter x coordinate of Goal Location(ex: 100): ")
+        gy=input("Enter y coordinate of Goal Location(ex: 100): ")
+        self.start_location.x, self.start_location.y = int(sx),int(sy)
+        self.goal_location.x, self.goal_location.y = int(gx),int(gy)
 
         self.selectStart = True
         self.obstacles = self.createObstacles()

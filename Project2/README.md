@@ -7,7 +7,7 @@
 ## Dijsktra Algorithm for Path Planning
 ### Run Algorithm:
 ```bash
-python3 main.py
+python3 Dijkstra-pathplanning-Aswath-Muthuselvam.py
 ```
 Input the start and goal state
 ### Files:
