@@ -1,4 +1,3 @@
-from cvxpy import Solution
 import pygame
 import sys
 from arena import Arena
@@ -7,10 +6,6 @@ from queue import PriorityQueue
 import math
 import time
 
-GRAY = (220, 220, 220)
-BLUE = (0, 20, 108)
-CYAN = (136, 255, 196)
-BLACK = (0, 0, 0)
 class Dijkstra:
 
     def __init__(self):
@@ -67,6 +62,16 @@ if __name__ == "__main__":
     arena = Arena()
     dijkstra = Dijkstra()
     solution_found = False
+    
+    for i in range(arena.WIDTH):
+        for j in range(arena.HEIGHT):
+            node = Arena.Node(i, j)
+            if (arena.isCollision(i,j)):
+                obstacle_node = arena.obstacle_nodes.get((node.x,node.y))
+                if not obstacle_node:
+                    arena.obstacle_nodes[(i, j)] = node
+                continue
+    arena.start_time = time.time()
     while(not solution_found): # your main loop
         # get all events
         arena.updateEvents()
@@ -76,5 +81,4 @@ if __name__ == "__main__":
 
         # Update MAP - Pygame display
         arena.drawAll()
-    arena.drawAll()
-    input()
+    arena.displayResults()
