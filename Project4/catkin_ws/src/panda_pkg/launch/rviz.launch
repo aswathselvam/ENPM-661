@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<launch>
+   <!-- <node name="panda_rviz_node" pkg="panda_pkg" type="publish_baselinkTF.py" /> -->
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find panda_pkg)/rviz/config_file.rviz" />
+
+</launch>
