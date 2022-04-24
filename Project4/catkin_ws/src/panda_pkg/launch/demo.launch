@@ -2,76 +2,11 @@
 
 <launch>
     
-    <!-- <include file="$(find panda_moveit_config)/launch/demo.launch" /> -->
 
+  <env name="GAZEBO_MODEL_PATH"
+        value="$(find panda_pkg)/models:$(optenv GAZEBO_MODEL_PATH)" />
 
-  <!-- <env name="GAZEBO_MODEL_PATH"
-       value="$(find panda_pkg):$(optenv GAZEBO_MODEL_PATH)" />
-
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name"  value="$(find panda_pkg)/worlds/pick_place.world"/>
-    <arg name="debug" value="false" />
-    <arg name="gui" value="true" />
-    <arg name="paused" value="false"/>
-    <arg name="use_sim_time" value="true"/>
-    <arg name="headless" value="false"/>
-    <arg name="verbose" value="false" />
-  </include> -->
-
-<!-- GAZEBO arguments -->
-    <arg name="paused" default="false" />
-    <arg name="use_sim_time" default="true" />
-    <arg name="gui" default="true" />
-    <arg name="headless" default="false" />
-    <arg name="debug" default="false" />
-
-    <!--launch GAZEBO with own world configuration -->
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find panda_pkg)/world/pick_place.world"/>
-        <arg name="debug" value="$(arg debug)" />
-        <arg name="gui" value="$(arg gui)" />
-        <arg name="paused" value="$(arg paused)" />
-        <arg name="use_sim_time" value="$(arg use_sim_time)" />
-        <arg name="headless" value="$(arg headless)" />
-    </include>
-
-
-  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find panda_pkg)/urdf/panda_arm_hand.urdf.xacro" />
-
-  <!-- Spawn Robot -->
-  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model panda" />
-
-<!-- Spawn Object while launching -->
-    <!-- <node name="spawn_bowl_urdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find panda_pkg)/models/bar_clamp.urdf -urdf -model bar_clamp -x 0.4 -y 0 -z 1.1" /> -->
-    
-    <!-- Load joint controller configurations from YAML file to parameter server -->
-    <rosparam file="$(find panda_pkg)/config/panda_control.yaml" command="load" />
-
-    <!-- load the controllers -->
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller panda_arm_controller" />
-    <node name="controller_spawner_hand" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="panda_hand_controller" />
-
-    <!-- convert joint states to TF transforms for rviz, etc -->
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
-  
-    <!-- Launch MoveIt! Rviz -->
-    <!-- <include file="$(find panda_moveit_config)/launch/planning_context.launch">
-        <arg name="load_robot_description" value="true" />
-    </include> -->
-    <!-- <include file="$(find panda_moveit_config)/launch/move_group.launch" /> -->
-    <group if="$(arg gui)">
-        <include file="$(find panda_moveit_config)/launch/moveit_rviz.launch" />
-    </group> 
-
-    <node name="joint_state_desired_publisher" pkg="topic_tools" type="relay" args="joint_states joint_states_desired" />
-
-    <!-- run custom node for automatic intialization -->
-    <!-- <node pkg="panda_pkg" type="robot_state_initializer_node" name="robot_state_initializer_node" /> -->
-
-    <!--Obtain depth image in Moveit and Gazebo -->
-    <!-- <include file="$(find realsense_gazebo_plugin)/launch/depth_proc.launch"/> -->
-
-
+  <include file="$(find panda_moveit_config)/launch/demo_gazebo.launch" />
 
 
   <node pkg = "panda_pkg" type = "ik_pick_place.py" name = "ik_pick_place_node" output = "screen" />
@@ -81,5 +16,12 @@
     <!-- <node pkg="panda_pkg" type="robot_control_node" name="robot_control_node" output="screen" /> -->
 
   <!-- <include file="$(find panda_pkg)/launch/rviz.launch" /> -->
+
+  <!--Default node -->
+	<node
+    name="fake_joint_calibration"
+    pkg="rostopic"
+    type="rostopic"
+    args="pub /calibrated std_msgs/Bool true" />
 
 </launch>

@@ -1,6 +1,49 @@
 #!/usr/bin/env python3
+
+# Software License Agreement (BSD License)
+#
+# Copyright (c) 2021, Aswath Muthuselvam
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met: 
+#
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#  * Neither the name of SRI International nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# Author: Acorn Pooley, Mike Lautman
+
+## BEGIN_SUB_TUTORIAL imports
+##
+## To use the Python MoveIt interfaces, we will import the `moveit_commander`_ namespace.
+## This namespace provides us with a `MoveGroupCommander`_ class, a `PlanningSceneInterface`_ class,
+## and a `RobotCommander`_ class. More on these below. We also import `rospy`_ and some messages that we will use:
+##
+
 # Python 2/3 compatibility imports
 from __future__ import print_function
+import quaternion
 from six.moves import input
 
 import sys
@@ -11,7 +54,14 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 
 from gazebo_msgs.srv import GetLinkState 
-
+from geometry_msgs.msg import (
+    PoseStamped,
+    Pose,
+    Point,
+    Quaternion,
+)
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from moveit_msgs.msg import PlanningScene
 
 try:
     from math import pi, tau, dist, fabs, cos
@@ -64,8 +114,10 @@ def getLocations(model_info, name):
     obj = model_info(name,"world")
     x = obj.link_state.pose.position.x
     y = obj.link_state.pose.position.y
-    z = obj.link_state.pose.position.z + 0.1
-    return np.array([x, y, z])
+    z = obj.link_state.pose.position.z 
+    orientation = obj.link_state.pose.orientation
+    # print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw : ", w) 
+    return np.array([x, y, z, orientation])
 
 
 class MoveGroupPythonInterfaceTutorial(object):
@@ -192,10 +244,25 @@ class MoveGroupPythonInterfaceTutorial(object):
         ## We can plan a motion for this group to a desired pose for the
         ## end-effector:
         pose_goal = geometry_msgs.msg.Pose()
-        pose_goal.orientation.w = 1.0
+        print("-"*20,"\nGoing to position:\n",position)
+        qw,qx,qy,qz = quaternion_from_euler(0,pi,0)
+
+        pose_goal.orientation.w = qw
+        pose_goal.orientation.x = qx
+        pose_goal.orientation.y = qy
+        pose_goal.orientation.z = qz
+        
+        # quaternion = Quaternion(x=position[3].x, y=position[3].y, z=position[3].z, w=position[3].w)
+        # euler = euler_from_quaternion([position[3].x,position[3].y,position[3].z,position[3].w])
+        # roll = euler[0]
+        # pitch = euler[1]
+        # yaw = euler[2]
+        # print("RPY: ",roll,pitch,yaw)
+
+        print(quaternion)
         pose_goal.position.x = position[0]
         pose_goal.position.y = position[1]
-        pose_goal.position.z = position[2]
+        pose_goal.position.z = position[2]+0.1
 
         move_group.set_pose_target(pose_goal)
 
@@ -455,17 +522,35 @@ def main():
         )
         tutorial = MoveGroupPythonInterfaceTutorial()
 
-        input(
-            "============ Press `Enter` to execute a movement using a joint state goal ..."
-        )
-        tutorial.go_to_joint_state()
-
-        input("============ Press `Enter` to execute a movement using a pose goal ...")
+        # input(
+        #     "============ Press `Enter` to execute a movement using a joint state goal ..."
+        # )
+        # tutorial.go_to_joint_state()
+        
+        # Add Table mesh for planner
+        scene_pub = rospy.Publisher('/move_group/monitored_planning_scene', PlanningScene, queue_size=10)
+        # robot = moveit_commander.RobotCommander()
         model_info= rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)  
 
-        start_location = getLocations(model_info, "unit_box0::link")
-        offset = getLocations(model_info, "panda::panda_link0")
-        start_location = start_location - offset
+        REFERENCE_FRAME = '/world'
+        obj = model_info("table","world")
+        pose = obj.link_state.pose
+        table_id = "table"
+        pose_Ground = geometry_msgs.msg.PoseStamped()
+        pose_Ground.header.frame_id = REFERENCE_FRAME
+        # pose_Ground.header.frame_id = robot.get_planning_frame()
+        pose_Ground.pose.position.x = pose.position.x
+        pose_Ground.pose.position.y = pose.position.y
+        pose_Ground.pose.position.z = pose.position.z
+        tutorial.scene.add_mesh(table_id,pose_Ground,'/home/aswath/umd/661/ENPM-661/Project4/catkin_ws/src/panda_pkg/models/table_scaled.stl')
+        
+        # scene_pub.publish(PlanningScene)
+
+
+        input("============ Press `Enter` to execute a movement using a pose goal ...")
+        start_location = getLocations(model_info, "unit_box_0::link")
+        # offset = getLocations(model_info, "panda::panda_link0")
+        # start_location[:3] = offset[:3]- start_location[:3] 
         tutorial.go_to_pose_goal(start_location)
 
         input("============ Press `Enter` to plan and display a Cartesian path ...")
