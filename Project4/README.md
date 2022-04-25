@@ -52,7 +52,7 @@ source devel/setup.bash
 
 ```
 
-Steps to run:
+Steps to run the simulation:
 ```
 roslaunch panda_moveit_config demo_gazebo.launch
 
