@@ -54,6 +54,7 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 from std_msgs.msg import Float64
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from franka_interface import GripperInterface
 
 from gazebo_msgs.srv import GetLinkState 
 from geometry_msgs.msg import (
@@ -121,20 +122,20 @@ def getLocations(model_info, name):
     # print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw : ", w) 
     return np.array([x, y, z, orientation])
 
-# class Gripper:
-#     def __init__(self):
-#         self.finger1_pub = rospy.Publisher('/panda_finger1_controller/command', Float64, queue_size=10)
-#         self.finger2_pub = rospy.Publisher('/panda_finger2_controller/command', Float64, queue_size=10)
-#         rospy.sleep(3)
+class Gripper:
+    def __init__(self):
+        self.finger1_pub = rospy.Publisher('/panda_finger1_controller/command', Float64, queue_size=10)
+        self.finger2_pub = rospy.Publisher('/panda_finger2_controller/command', Float64, queue_size=10)
+        rospy.sleep(3)
         
-#     def grasp(self, finger1_y, finger2_y):
-#         finger1_data = Float64()
-#         finger1_data.data = finger1_y
-#         finger2_data = Float64()
-#         finger2_data.data = finger2_y
+    def grasp(self, finger1_y, finger2_y):
+        finger1_data = Float64()
+        finger1_data.data = finger1_y
+        finger2_data = Float64()
+        finger2_data.data = finger2_y
         
-#         self.finger1_pub.publish(finger1_data)
-#         self.finger2_pub.publish(finger2_data)
+        self.finger1_pub.publish(finger1_data)
+        self.finger2_pub.publish(finger2_data)
 
 class MoveGroupPythonInterfaceTutorial(object):
     """MoveGroupPythonInterfaceTutorial"""
@@ -282,115 +283,115 @@ class MoveGroupPythonInterfaceTutorial(object):
         pose_goal.position.y = position[1]
         pose_goal.position.z = position[2]+0.1
 
-        grasp = Grasp()
-        grasp.grasp_pose.pose = pose_goal
-        grasp.grasp_pose.header.frame_id = "panda_link0"
+        # grasp = Grasp()
+        # grasp.grasp_pose.pose = pose_goal
+        # grasp.grasp_pose.header.frame_id = "panda_link0"
 
 
-        # // Setting pre-grasp approach
-        # // ++++++++++++++++++++++++++
-        # /* Defined with respect to frame_id */
-        grasp.pre_grasp_approach.direction.header.frame_id = "panda_link0"
-        # /* Direction is set as positive x axis */
-        grasp.pre_grasp_approach.direction.vector.z = -1.0
-        grasp.pre_grasp_approach.min_distance = 0.095
-        grasp.pre_grasp_approach.desired_distance = 0.115
+        # # // Setting pre-grasp approach
+        # # // ++++++++++++++++++++++++++
+        # # /* Defined with respect to frame_id */
+        # grasp.pre_grasp_approach.direction.header.frame_id = "panda_link0"
+        # # /* Direction is set as positive x axis */
+        # grasp.pre_grasp_approach.direction.vector.z = -1.0
+        # grasp.pre_grasp_approach.min_distance = 0.095
+        # grasp.pre_grasp_approach.desired_distance = 0.115
 
-        # Setting post-grasp retreat
-        grasp.post_grasp_retreat.direction.header.frame_id = "panda_link0"
-        grasp.post_grasp_retreat.direction.vector.z = 1.0
-        grasp.post_grasp_retreat.min_distance = 0.1
-        grasp.post_grasp_retreat.desired_distance = 0.25
-
-
-        # hand_commander = moveit_commander.MoveGroupCommander("panda_hand")
-        # hand_commander.set_named_target("open")
-        # plan = hand_commander.plan()
-        # if not hand_commander.execute(plan, wait=True):
-        #     return False
-        # return True
+        # # Setting post-grasp retreat
+        # grasp.post_grasp_retreat.direction.header.frame_id = "panda_link0"
+        # grasp.post_grasp_retreat.direction.vector.z = 1.0
+        # grasp.post_grasp_retreat.min_distance = 0.1
+        # grasp.post_grasp_retreat.desired_distance = 0.25
 
 
-        grasp.pre_grasp_posture.joint_names.append("panda_finger_joint1")
-        grasp.pre_grasp_posture.joint_names.append("panda_finger_joint2")
-        jt = JointTrajectory()
-        jtp = JointTrajectoryPoint()
+        # # hand_commander = moveit_commander.MoveGroupCommander("panda_hand")
+        # # hand_commander.set_named_target("open")
+        # # plan = hand_commander.plan()
+        # # if not hand_commander.execute(plan, wait=True):
+        # #     return False
+        # # return True
+
+
+        # grasp.pre_grasp_posture.joint_names.append("panda_finger_joint1")
+        # grasp.pre_grasp_posture.joint_names.append("panda_finger_joint2")
+        # jt = JointTrajectory()
+        # jtp = JointTrajectoryPoint()
         
-        jtp.positions = (0.04, 0.04) 
-        jtp.time_from_start = rospy.Duration(1) #1 second
-        jt.joint_names = ["panda_finger_joint1","panda_finger_joint2"] 
-        jt.points.append(jtp)
-        grasp.grasp_posture.points.append(jtp)
+        # jtp.positions = (0.04, 0.04) 
+        # jtp.time_from_start = rospy.Duration(1) #1 second
+        # jt.joint_names = ["panda_finger_joint1","panda_finger_joint2"] 
+        # jt.points.append(jtp)
+        # grasp.grasp_posture.points.append(jtp)
 
-        grasp.grasp_posture.joint_names.append("panda_finger_joint1")
-        grasp.grasp_posture.joint_names.append("panda_finger_joint2")
-        jt = JointTrajectory()
-        jtp = JointTrajectoryPoint()
+        # grasp.grasp_posture.joint_names.append("panda_finger_joint1")
+        # grasp.grasp_posture.joint_names.append("panda_finger_joint2")
+        # jt = JointTrajectory()
+        # jtp = JointTrajectoryPoint()
         
-        jtp.positions = (0.03, 0.01) 
-        jtp.time_from_start = rospy.Duration(1) #1 second
-        jt.joint_names = ["panda_finger_joint1","panda_finger_joint2"] 
-        jt.points.append(jtp)
-        grasp.grasp_posture.points.append(jtp)
+        # jtp.positions = (0.03, 0.01) 
+        # jtp.time_from_start = rospy.Duration(1) #1 second
+        # jt.joint_names = ["panda_finger_joint1","panda_finger_joint2"] 
+        # jt.points.append(jtp)
+        # grasp.grasp_posture.points.append(jtp)
 
-        move_group.pick("unit_box_0",grasp)
+        # move_group.pick("unit_box_0",grasp)
 
-        rospy.sleep(1)
-
-
-        place_location = PlaceLocation()
-
-        # // Setting place location pose
-        # // +++++++++++++++++++++++++++
-        place_location.place_pose.header.frame_id = "panda_link0"
-        place_location.place_pose.pose = pose_goal
-        place_location.place_pose.pose.position.y += 0.3
-
-        # // Setting pre-place approach
-        # // ++++++++++++++++++++++++++
-        # /* Defined with respect to frame_id */
-        place_location.pre_place_approach.direction.header.frame_id = "panda_link0"
-        # /* Direction is set as negative z axis */
-        place_location.pre_place_approach.direction.vector.z = -1.0
-        place_location.pre_place_approach.min_distance = 0.095
-        place_location.pre_place_approach.desired_distance = 0.115
-
-        # // Setting post-grasp retreat
-        # // ++++++++++++++++++++++++++
-        # /* Defined with respect to frame_id */
-        place_location.post_place_retreat.direction.header.frame_id = "panda_link0"
-        # /* Direction is set as negative y axis */
-        place_location.post_place_retreat.direction.vector.y = -1.0
-        place_location.post_place_retreat.min_distance = 0.1
-        place_location.post_place_retreat.desired_distance = 0.25
-
-        # // Setting posture of eef after placing object
-        # // +++++++++++++++++++++++++++++++++++++++++++
-        # /* Similar to the pick case */
+        # rospy.sleep(1)
 
 
+        # place_location = PlaceLocation()
 
-        place_location.post_place_posture.joint_names.append("panda_finger_joint1")
-        place_location.post_place_posture.joint_names.append("panda_finger_joint2")
-        jtp = JointTrajectoryPoint()
+        # # // Setting place location pose
+        # # // +++++++++++++++++++++++++++
+        # place_location.place_pose.header.frame_id = "panda_link0"
+        # place_location.place_pose.pose = pose_goal
+        # place_location.place_pose.pose.position.y += 0.3
+
+        # # // Setting pre-place approach
+        # # // ++++++++++++++++++++++++++
+        # # /* Defined with respect to frame_id */
+        # place_location.pre_place_approach.direction.header.frame_id = "panda_link0"
+        # # /* Direction is set as negative z axis */
+        # place_location.pre_place_approach.direction.vector.z = -1.0
+        # place_location.pre_place_approach.min_distance = 0.095
+        # place_location.pre_place_approach.desired_distance = 0.115
+
+        # # // Setting post-grasp retreat
+        # # // ++++++++++++++++++++++++++
+        # # /* Defined with respect to frame_id */
+        # place_location.post_place_retreat.direction.header.frame_id = "panda_link0"
+        # # /* Direction is set as negative y axis */
+        # place_location.post_place_retreat.direction.vector.y = -1.0
+        # place_location.post_place_retreat.min_distance = 0.1
+        # place_location.post_place_retreat.desired_distance = 0.25
+
+        # # // Setting posture of eef after placing object
+        # # // +++++++++++++++++++++++++++++++++++++++++++
+        # # /* Similar to the pick case */
+
+
+
+        # place_location.post_place_posture.joint_names.append("panda_finger_joint1")
+        # place_location.post_place_posture.joint_names.append("panda_finger_joint2")
+        # jtp = JointTrajectoryPoint()
         
-        jtp.positions = (0.0, 0.0) 
-        jtp.time_from_start = rospy.Duration(1) #1 second
-        place_location.post_place_posture.points.append(jtp)
+        # jtp.positions = (0.0, 0.0) 
+        # jtp.time_from_start = rospy.Duration(1) #1 second
+        # place_location.post_place_posture.points.append(jtp)
 
         
 
 
 
-        # // Set support surface as table2.
-        # move_group.setSupportSurfaceName("table")
-        # // Call place to place the object using the place locations given.
-        move_group.place("unit_box_0", place_location)
+        # # // Set support surface as table2.
+        # # move_group.setSupportSurfaceName("table")
+        # # // Call place to place the object using the place locations given.
+        # move_group.place("unit_box_0", place_location)
 
-        rate = rospy.Rate(1.0)
+        # rate = rospy.Rate(1.0)
 
-        while not rospy.is_shutdown():
-            rate.sleep()
+        # while not rospy.is_shutdown():
+        #     rate.sleep()
 
 
 
@@ -409,15 +410,15 @@ class MoveGroupPythonInterfaceTutorial(object):
         # print(grasp.pre_grasp_posture.points.positions[0])
         # print("GRASP joint names: ", grasp.pre_grasp_posture.joint_names)
 
-        # move_group.set_pose_target(pose_goal)
+        move_group.set_pose_target(pose_goal)
 
         ## Now, we call the planner to compute the plan and execute it.
-        # plan = move_group.go(wait=True)
+        plan = move_group.go(wait=True)
         # Calling `stop()` ensures that there is no residual movement
-        # move_group.stop()
+        move_group.stop()
         # It is always good to clear your targets after planning with poses.
         # Note: there is no equivalent function for clear_joint_value_targets()
-        # move_group.clear_pose_targets()
+        move_group.clear_pose_targets()
 
         ## END_SUB_TUTORIAL
 
@@ -707,8 +708,8 @@ def main():
 
             
 
-        # tutorial.scene.add_mesh(table_id,getpose(model_info("table","world")),'/home/aswath/umd/661/ENPM-661/Project4/catkin_ws/src/panda_pkg/models/table_scaled.stl')
-        # tutorial.scene.add_box("obstacle_box",getpose(model_info("unit_box::link","world")),size=(0.30307, 0.05, 0.407809))
+        tutorial.scene.add_mesh(table_id,getpose(model_info("table","world")),'/home/aswath/umd/661/ENPM-661/Project4/catkin_ws/src/panda_pkg/models/table_scaled.stl')
+        tutorial.scene.add_box("obstacle_box",getpose(model_info("unit_box::link","world")),size=(0.30307, 0.05, 0.407809))
         ### Make the target purple ###
         colors={}
         colors['obstacle_box']=getColor('obstacle_box',0.6, 0, 0, 1.0)
@@ -716,53 +717,59 @@ def main():
         # tutorial.scene.setColor('obstacle_box',0.6, 0, 0, 1.0)
 
 
-        # tutorial.scene.add_box("object",getpose(model_info("unit_box_0::link","world")),size=(0.035, 0.035, 0.035))
+        tutorial.scene.add_box("object",getpose(model_info("unit_box_0::link","world")),size=(0.035, 0.035, 0.035))
         
         # scene_pub.publish(PlanningScene)
 
+        gi = GripperInterface()
+        print("Open performed sucessfully? ", gi.open())
+        rospy.sleep(1)
 
         start_location = getLocations(model_info, "unit_box_0::link")
         # offset = getLocations(model_info, "panda::panda_link0")
         # start_location[:3] = offset[:3]- start_location[:3] 
         tutorial.go_to_pose_goal(start_location)
-        
+        print("Grasp performed sucessfully? ", gi.grasp( width=0.04, force=100, epsilon_inner = 0.001, epsilon_outer = 0.003))
+        # print("Close performed sucessfully? ", gi.close())
+        rospy.sleep(1)
 
         #Move to goal location
-        # goal_location = start_location
-        # goal_location[1] = goal_location[1]+0.3
-        # tutorial.go_to_pose_goal(goal_location)
+        goal_location = start_location
+        goal_location[1] = goal_location[1]+0.3
+        tutorial.go_to_pose_goal(goal_location)
+        # print("Open performed sucessfully? ", gi.open())
 
 
-        input("============ Press `Enter` to plan and display a Cartesian path ...")
-        cartesian_plan, fraction = tutorial.plan_cartesian_path()
-
-        input(
-            "============ Press `Enter` to display a saved trajectory (this will replay the Cartesian path)  ..."
-        )
-        tutorial.display_trajectory(cartesian_plan)
-
-        input("============ Press `Enter` to execute a saved path ...")
-        tutorial.execute_plan(cartesian_plan)
-
-        input("============ Press `Enter` to add a box to the planning scene ...")
-        tutorial.add_box()
-
-        input("============ Press `Enter` to attach a Box to the Panda robot ...")
-        tutorial.attach_box()
-
-        input(
-            "============ Press `Enter` to plan and execute a path with an attached collision object ..."
-        )
-        cartesian_plan, fraction = tutorial.plan_cartesian_path(scale=-1)
-        tutorial.execute_plan(cartesian_plan)
-
-        # input("============ Press `Enter` to detach the box from the Panda robot ...")
-        # tutorial.detach_box()
+        # input("============ Press `Enter` to plan and display a Cartesian path ...")
+        # cartesian_plan, fraction = tutorial.plan_cartesian_path()
 
         # input(
-        #     "============ Press `Enter` to remove the box from the planning scene ..."
+        #     "============ Press `Enter` to display a saved trajectory (this will replay the Cartesian path)  ..."
         # )
-        # tutorial.remove_box()
+        # tutorial.display_trajectory(cartesian_plan)
+
+        # input("============ Press `Enter` to execute a saved path ...")
+        # tutorial.execute_plan(cartesian_plan)
+
+        # input("============ Press `Enter` to add a box to the planning scene ...")
+        # tutorial.add_box()
+
+        # input("============ Press `Enter` to attach a Box to the Panda robot ...")
+        # tutorial.attach_box()
+
+        # input(
+        #     "============ Press `Enter` to plan and execute a path with an attached collision object ..."
+        # )
+        # cartesian_plan, fraction = tutorial.plan_cartesian_path(scale=-1)
+        # tutorial.execute_plan(cartesian_plan)
+
+        # # input("============ Press `Enter` to detach the box from the Panda robot ...")
+        # # tutorial.detach_box()
+
+        # # input(
+        # #     "============ Press `Enter` to remove the box from the planning scene ..."
+        # # )
+        # # tutorial.remove_box()
 
         print("============ Python tutorial demo complete!")
     except rospy.ROSInterruptException:

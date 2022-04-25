@@ -298,14 +298,14 @@
       <pose>-0.090747 -0.838616 0.5 0 -0 0</pose>
       <link name='link'>
         <inertial>
-          <mass>1</mass>
+          <mass>0.1</mass>
           <inertia>
-            <ixx>0.166667</ixx>
+            <ixx>0.066667</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.166667</iyy>
+            <iyy>0.066667</iyy>
             <iyz>0</iyz>
-            <izz>0.166667</izz>
+            <izz>0.066667</izz>
           </inertia>
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
@@ -315,20 +315,46 @@
               <size>0.999999 0.999997 1</size>
             </box>
           </geometry>
-          <max_contacts>10</max_contacts>
           <surface>
             <contact>
-              <ode/>
+              <collide_bitmask>1</collide_bitmask>
+              <poissons_ratio>0.5</poissons_ratio>
+              <elastic_modulus>1e8</elastic_modulus>
+              <ode>
+                <kp>1e+06</kp>
+                <kd>1e+06</kd>
+                <max_vel>1</max_vel>
+                <min_depth>0.002</min_depth>
+              </ode>
+              <bullet>
+                <kp>1e+06</kp>
+                <kd>1e+06</kd>
+              </bullet>
             </contact>
             <bounce/>
             <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
               <torsional>
-                <ode/>
+                <coefficient>10.0</coefficient>
+                <use_patch_radius>true</use_patch_radius>
+                <patch_radius>0.05</patch_radius>
               </torsional>
-              <ode/>
             </friction>
           </surface>
         </collision>
+
+        <mu1>10</mu1>
+        <mu2>10</mu2>
+        <maxVel>1</maxVel>
+        <kp>1000000.0</kp>
+        <kd>100.0</kd> 
+        <fdir1>0 0 1</fdir1>
+        <minDepth>0.0</minDepth>
+        <maxContacts>100</maxContacts>
+
         <visual name='visual'>
           <geometry>
             <box>
