@@ -1,5 +1,8 @@
 <launch>
 
+  <env name="GAZEBO_MODEL_PATH"
+        value="$(find panda_pkg)/models:$(optenv GAZEBO_MODEL_PATH)" />
+
   <!-- specify the planning pipeline -->
   <arg name="pipeline" default="ompl" />
 
@@ -10,6 +13,11 @@
   <!-- Gazebo specific options -->
   <arg name="gazebo_gui" default="true" />
   <arg name="paused" default="false" />
+  
+  <rosparam command="load" file="$(find panda_pkg)/config/panda_control.yaml" />
+
+  <!-- <node name="controller_spawner_arm" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="panda" args="joint_state_controller panda_arm_controller" /> -->
+  <node name="controller_spawner_hand" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="panda" args="panda_hand_controller" />
 
   <!-- Launch the gazebo simulator and spawn the robot -->
   <include file="$(find franka_gazebo)/launch/panda.launch" pass_all_args="true">
@@ -17,7 +25,7 @@
     <arg name="use_gripper" default="$(arg load_gripper)" />
     <arg name="x" value="0.75" />
     <arg name="y" value="0.7" />
-    <arg name="yaw" value="1.5" />
+    <arg name="yaw" value="2.3" />
     <arg name="world" value="$(find panda_pkg)/worlds/pick_place.world" />
     <arg name="controller" default="$(arg transmission)_joint_trajectory_controller" />
   </include>
