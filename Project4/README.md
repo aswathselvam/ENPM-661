@@ -1,11 +1,13 @@
 # Project 4 
 Authors:
+```
 - Name: Aswath Muthuselvam 
 - UID: 118286204
-
+```
+```
 - Name: Gokul Hari
 - UID: 117430646
-
+```
 - Course: ENPM 661 - Planning for Autonomous Robots
 
 
